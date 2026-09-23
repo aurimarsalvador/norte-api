@@ -31,13 +31,13 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
       display: flex;
       inset: 0;
       justify-content: center;
-      padding: calc(var(--espaco) * 2);
+      padding: var(--space-4);
       position: fixed;
       z-index: 50;
     }
 
     .caixa {
-      box-shadow: var(--sombra);
+      box-shadow: var(--shadow-lg);
       max-height: 85vh;
       max-width: 560px;
       overflow-y: auto;
@@ -47,7 +47,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
     header {
       align-items: flex-start;
       display: flex;
-      gap: var(--espaco);
+      gap: var(--space-2);
       justify-content: space-between;
     }
 

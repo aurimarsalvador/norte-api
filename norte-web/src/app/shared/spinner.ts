@@ -12,18 +12,18 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   styles: `
     .carregando {
       align-items: center;
-      color: var(--cor-texto-suave);
+      color: var(--text-muted);
       display: flex;
-      gap: calc(var(--espaco) * 1.5);
+      gap: var(--space-3);
       justify-content: center;
-      padding: calc(var(--espaco) * 4);
+      padding: var(--space-8);
     }
 
     .giro {
       animation: girar 0.9s linear infinite;
-      border: 3px solid var(--cor-borda);
+      border: 3px solid var(--border-default);
       border-radius: 50%;
-      border-top-color: var(--cor-primaria);
+      border-top-color: var(--action-primary);
       display: inline-block;
       height: 22px;
       width: 22px;

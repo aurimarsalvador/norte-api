@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { Icon } from '../../shared/icon';
+import { Icon } from './icon';
 
 /**
- * Pecas pequenas das telas de entrada e cadastro. Ficam juntas porque so fazem sentido
- * nesta jornada.
+ * Pecas de layout das telas: marca, barra do topo, adesivo, cabecalhos e a linha de link
+ * alternativo. Nasceram na jornada de entrada e hoje servem a todas as telas.
  */
 
 /** A marca em texto: nao existe logo ainda, entao "norte" em Young Serif ocupa o lugar. */
@@ -27,7 +27,11 @@ export class Wordmark {
   readonly size = input(26);
 }
 
-/** Barra do topo: marca (ou botao de voltar) a esquerda, e o que for projetado a direita. */
+/**
+ * Barra do topo: marca (ou botao de voltar) a esquerda, e o que for projetado a direita.
+ * O voltar e um link quando o destino e fixo, ou um botao que emite (voltar) quando depende
+ * de estado da tela, como a pergunta anterior do questionario.
+ */
 @Component({
   selector: 'norte-top-bar',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -37,6 +41,10 @@ export class Wordmark {
       <a class="voltar" [routerLink]="destino" aria-label="Voltar">
         <norte-icon name="arrow-left" />
       </a>
+    } @else if (comVoltar()) {
+      <button class="voltar" type="button" aria-label="Voltar" (click)="voltar.emit()">
+        <norte-icon name="arrow-left" />
+      </button>
     } @else {
       <norte-wordmark />
     }
@@ -56,8 +64,10 @@ export class Wordmark {
       border: 1.5px solid var(--border-default);
       border-radius: 999px;
       color: var(--text-strong);
+      cursor: pointer;
       display: grid;
       height: 44px;
+      padding: 0;
       place-items: center;
       width: 44px;
     }
@@ -65,6 +75,57 @@ export class Wordmark {
 })
 export class TopBar {
   readonly voltarPara = input<string | null>(null);
+  readonly comVoltar = input(false);
+  readonly voltar = output();
+}
+
+/** Sobrancelha, titulo em serifa e texto de apoio: a abertura de quase toda tela. */
+@Component({
+  selector: 'norte-intro',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    @if (sobrancelha()) {
+      <span class="sobrancelha">{{ sobrancelha() }}</span>
+    }
+    <h1 [class.menor]="tamanho() === 'h2'">{{ titulo() }}</h1>
+    @if (apoio()) {
+      <p [class.texto-suave]="apoioSuave()">{{ apoio() }}</p>
+    }
+  `,
+  styles: `
+    :host {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    h1,
+    p {
+      margin: 0;
+      text-wrap: balance;
+    }
+
+    h1.menor {
+      font-size: var(--fs-h2);
+      line-height: var(--lh-h2);
+    }
+
+    p {
+      color: var(--text-body);
+      text-wrap: pretty;
+    }
+
+    p.texto-suave {
+      color: var(--text-muted);
+    }
+  `,
+})
+export class Intro {
+  readonly titulo = input.required<string>();
+  readonly sobrancelha = input('');
+  readonly apoio = input('');
+  readonly apoioSuave = input(false);
+  readonly tamanho = input<'h1' | 'h2'>('h1');
 }
 
 /** Adesivo inclinado com uma frase de acolhimento, posicionado por quem o usa. */

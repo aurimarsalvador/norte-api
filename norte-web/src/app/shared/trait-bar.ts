@@ -1,84 +1,113 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
+import { arredondar } from './badge';
+
 /**
- * Barra de um trait do perfil.
+ * Barra de afinidade de uma caracteristica. As tres primeiras do perfil vem em verde-escuro
+ * (emphasis strong), as demais em verde-claro.
  *
- * O percentual chega como string (BigDecimal de escala 2 no backend) e so vira numero aqui,
- * para desenhar a largura. O texto mostrado continua sendo a string original, sem
- * reformatacao que possa alterar o valor.
+ * <p>O percentual chega como string (BigDecimal de escala 2 no backend) e so vira numero
+ * aqui, para desenhar a largura e o rotulo inteiro.
  */
 @Component({
   selector: 'norte-trait-bar',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class.suave]': "emphasis() === 'soft'",
+    '[class.pequena]': "size() === 'sm'",
+  },
   template: `
-    <div class="trait">
-      <div class="cabecalho">
-        <span class="nome">{{ name() }}</span>
-        <span class="valor">{{ percentage() }}%</span>
-      </div>
-      <div
-        class="trilho"
-        role="meter"
-        [attr.aria-valuenow]="largura()"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        [attr.aria-label]="name()"
-      >
-        <div class="preenchimento" [style.width.%]="largura()"></div>
-      </div>
-      @if (description()) {
-        <p class="texto-suave descricao">{{ description() }}</p>
-      }
+    <div class="cabecalho">
+      <span class="nome">{{ name() }}</span>
+      <span class="valor">{{ valor() }}%</span>
+    </div>
+    <div
+      class="trilho"
+      role="meter"
+      [attr.aria-valuenow]="valor()"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      [attr.aria-label]="name()"
+    >
+      <div class="preenchimento" [style.width.%]="valor()"></div>
     </div>
   `,
   styles: `
-    .trait {
-      margin-bottom: calc(var(--espaco) * 2);
+    :host {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    :host(.pequena) {
+      gap: 6px;
     }
 
     .cabecalho {
+      align-items: baseline;
       display: flex;
+      gap: 12px;
       justify-content: space-between;
-      gap: var(--espaco);
-      margin-bottom: 6px;
+    }
+
+    .nome,
+    .valor {
+      font-size: 16px;
+      line-height: 22px;
+    }
+
+    :host(.pequena) .nome,
+    :host(.pequena) .valor {
+      font-size: 15px;
     }
 
     .nome {
+      color: var(--text-strong);
       font-weight: 600;
     }
 
     .valor {
-      color: var(--cor-primaria);
+      color: var(--green-800);
       font-variant-numeric: tabular-nums;
       font-weight: 700;
     }
 
+    :host(.suave) .nome {
+      color: var(--text-body);
+    }
+
+    :host(.suave) .valor {
+      color: var(--text-muted);
+    }
+
     .trilho {
-      background: var(--cor-superficie-alta);
+      background: var(--cream-200);
       border-radius: 999px;
       height: 10px;
       overflow: hidden;
     }
 
-    .preenchimento {
-      background: linear-gradient(90deg, var(--cor-acento), var(--cor-primaria));
-      height: 100%;
-      transition: width 0.4s ease;
+    :host(.pequena) .trilho {
+      height: 8px;
     }
 
-    .descricao {
-      font-size: 0.85rem;
-      margin: 6px 0 0;
+    .preenchimento {
+      background: var(--green-700);
+      border-radius: 999px;
+      height: 100%;
+      transition: width var(--dur-slow) var(--ease-out);
+    }
+
+    :host(.suave) .preenchimento {
+      background: var(--green-300);
     }
   `,
 })
 export class TraitBar {
   readonly name = input.required<string>();
   readonly percentage = input.required<string>();
-  readonly description = input<string>('');
+  readonly emphasis = input<'strong' | 'soft'>('strong');
+  readonly size = input<'sm' | 'md'>('md');
 
-  protected readonly largura = computed(() => {
-    const valor = Number(this.percentage());
-    return Number.isFinite(valor) ? Math.min(100, Math.max(0, valor)) : 0;
-  });
+  protected readonly valor = computed(() => arredondar(this.percentage()));
 }

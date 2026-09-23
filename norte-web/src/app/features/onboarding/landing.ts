@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { Icon } from '../../shared/icon';
-import { AltRow, Sticker, TopBar } from './kit';
+import { AltRow, Sticker, TopBar } from '../../shared/kit';
 
 /**
  * Primeira tela: apresenta o Norte sem cobrar decisao nenhuma. A frase principal e o

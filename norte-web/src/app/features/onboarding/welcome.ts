@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/auth.service';
 import { Icon } from '../../shared/icon';
-import { Sticker, TopBar } from './kit';
+import { Sticker, TopBar } from '../../shared/kit';
 import { primeiroNome } from './validacao';
 
 /**

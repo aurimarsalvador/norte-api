@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { Button } from '../../shared/button';
 import { TextField } from '../../shared/text-field';
-import { AltRow, FormHeader, TopBar, Wordmark } from './kit';
+import { AltRow, FormHeader, TopBar, Wordmark } from '../../shared/kit';
 import { emailValido, statusDoCampo, validador } from './validacao';
 
 @Component({

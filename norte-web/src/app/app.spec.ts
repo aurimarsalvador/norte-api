@@ -21,43 +21,40 @@ describe('App', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('sem sessao, oferece entrar e criar conta em vez da navegacao interna', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-
-    const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(texto).toContain('Entrar');
-    expect(texto).toContain('Criar conta');
-    expect(texto).not.toContain('Meu Caminho');
-  });
-
-  it('mantem o lembrete de que a escolha e do estudante', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-
-    const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(texto).toContain('A escolha continua sendo sua.');
-  });
-
-  it('a apresentacao desenha a propria barra, sem o cabecalho do app', async () => {
+  it('a apresentacao nao mostra a barra de abas', async () => {
     const fixture = TestBed.createComponent(App);
     await TestBed.inject(Router).navigateByUrl('/');
     await fixture.whenStable();
 
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.querySelector('header.barra')).toBeNull();
+    expect(el.querySelector('norte-bottom-nav')).toBeNull();
     expect(el.textContent).toContain('Você não precisa escolher sua carreira');
   });
 
-  it('quem ja tem sessao pula a apresentacao e cai no Meu Caminho', async () => {
+  it('quem ja tem sessao pula a apresentacao e cai no Meu Caminho, com a aba acesa', async () => {
     localStorage.setItem('norte.token', 'token-de-teste');
     const fixture = TestBed.createComponent(App);
     const router = TestBed.inject(Router);
 
     await router.navigateByUrl('/');
     await fixture.whenStable();
+    fixture.detectChanges();
 
     expect(router.url).toBe('/meu-caminho');
-    expect((fixture.nativeElement as HTMLElement).querySelector('header.barra')).not.toBeNull();
+    const ativa = (fixture.nativeElement as HTMLElement).querySelector(
+      'norte-bottom-nav a[aria-current="page"]',
+    );
+    expect(ativa?.textContent).toContain('Meu Caminho');
+  });
+
+  it('o questionario esconde a barra de abas', async () => {
+    localStorage.setItem('norte.token', 'token-de-teste');
+    const fixture = TestBed.createComponent(App);
+
+    await TestBed.inject(Router).navigateByUrl('/questionario');
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('norte-bottom-nav')).toBeNull();
   });
 });

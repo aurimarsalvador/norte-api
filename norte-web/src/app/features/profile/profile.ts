@@ -1,72 +1,127 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { Profile as ProfileModel } from '../../core/models/api.models';
-import { EmptyState } from '../../shared/empty-state';
+import { Icon } from '../../shared/icon';
+import { Intro, TopBar } from '../../shared/kit';
 import { Spinner } from '../../shared/spinner';
 import { TraitBar } from '../../shared/trait-bar';
 
+/**
+ * Perfil exploratorio: as caracteristicas que mais apareceram nas respostas, em ordem. O
+ * texto e sempre provisorio ("por enquanto") e a nota amarela lembra que nao e um rotulo.
+ */
 @Component({
   selector: 'norte-profile',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, TraitBar, Spinner, EmptyState],
+  imports: [RouterLink, Icon, Intro, TopBar, TraitBar, Spinner],
   template: `
-    <div class="conteudo">
-      <h1>Seu perfil de caracteristicas</h1>
-      <p class="texto-suave">
-        Cada barra mostra o quanto as suas respostas apontaram para aquela caracteristica,
-        comparado ao maximo que voce poderia ter pontuado nas perguntas que respondeu. E um
-        retrato do que voce respondeu hoje, nao um diagnostico.
-      </p>
+    <div class="tela">
+      <norte-top-bar />
 
-      @if (carregando()) {
-        <norte-spinner label="Calculando seu perfil..." />
-      } @else if (erro()) {
-        <p class="aviso aviso--erro">{{ erro() }}</p>
-      } @else if (perfil(); as dados) {
-        @if (dados.traits.length) {
-          <section class="cartao">
-            @for (trait of dados.traits; track trait.traitId) {
+      <div class="tela-corpo tela-corpo--pilha">
+        @if (carregando()) {
+          <norte-spinner label="Calculando seu perfil..." />
+        } @else if (erro()) {
+          <p class="aviso aviso--erro" role="alert">{{ erro() }}</p>
+        } @else if (tracos().length) {
+          <norte-intro
+            sobrancelha="Seu perfil exploratório"
+            titulo="O que mais aparece em você, por enquanto"
+            apoio="A partir das suas respostas, estas são as características que mais se destacaram."
+          />
+
+          <section class="barras">
+            @for (traco of tracos(); track traco.traitId; let i = $index) {
               <norte-trait-bar
-                [name]="trait.name"
-                [percentage]="trait.percentage"
-                [description]="trait.description"
+                [name]="traco.name"
+                [percentage]="traco.percentage"
+                [emphasis]="i < 3 ? 'strong' : 'soft'"
               />
             }
           </section>
 
-          <p class="texto-suave rodape">
-            Baseado em {{ dados.answeredQuestions }} pergunta(s) respondida(s).
-            @if (dados.status === 'IN_PROGRESS') {
-              O questionario ainda esta em andamento, entao este retrato pode mudar.
-            }
-          </p>
+          <div class="nota">
+            <norte-icon name="info" [size]="22" color="var(--ink-900)" />
+            <p>
+              <strong>Esse perfil não é um rótulo.</strong> Ele mostra suas preferências de hoje
+              e vai mudando conforme você explora, experimenta e responde de novo.
+            </p>
+          </div>
 
-          <a class="botao" routerLink="/profissoes">Ver profissoes compativeis</a>
+          @if (perfil()?.status === 'IN_PROGRESS') {
+            <p class="texto-suave rodape">
+              Baseado em {{ perfil()?.answeredQuestions }} respostas. Termine a jornada para
+              ver o retrato completo.
+            </p>
+          }
+
+          <div class="acoes">
+            <a class="botao botao--lg botao--largo" routerLink="/profissoes">
+              Ver carreiras recomendadas
+              <norte-icon name="arrow-right" />
+            </a>
+            @if (perfil()?.status === 'IN_PROGRESS') {
+              <a class="botao botao--discreto botao--largo" routerLink="/questionario">
+                Continuar a jornada
+              </a>
+            }
+          </div>
         } @else {
-          <norte-empty-state
-            title="Ainda nao ha o que mostrar"
-            message="Responda algumas perguntas do questionario para o seu perfil comecar a tomar forma."
-          >
-            <a class="botao" routerLink="/questionario">Comecar o questionario</a>
-          </norte-empty-state>
+          <norte-intro
+            sobrancelha="Seu perfil exploratório"
+            titulo="Seu perfil aparece aqui"
+            apoio="Ele nasce das suas respostas na jornada de autodescoberta. São situações do dia a dia, sem notas e sem pressa."
+          />
+          <a class="botao botao--lg botao--largo" routerLink="/questionario">
+            Começar a jornada
+            <norte-icon name="arrow-right" />
+          </a>
         }
-      } @else {
-        <norte-empty-state
-          title="Voce ainda nao comecou"
-          message="Seu perfil aparece aqui depois das primeiras respostas."
-        >
-          <a class="botao" routerLink="/questionario">Comecar o questionario</a>
-        </norte-empty-state>
-      }
+      </div>
     </div>
   `,
   styles: `
+    .barras {
+      background: var(--surface-card);
+      border: 1.5px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 20px;
+    }
+
+    .nota {
+      background: var(--sun-100);
+      border-radius: var(--radius-lg);
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .nota norte-icon {
+      margin-top: 1px;
+    }
+
+    .nota p {
+      color: var(--ink-900);
+      font-size: 16px;
+      line-height: 24px;
+      margin: 0;
+      text-wrap: pretty;
+    }
+
     .rodape {
-      font-size: 0.9rem;
-      margin-top: calc(var(--espaco) * 2);
+      margin: 0;
+    }
+
+    .acoes {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
   `,
 })
@@ -77,6 +132,13 @@ export class Profile {
   protected readonly perfil = signal<ProfileModel | null>(null);
   protected readonly carregando = signal(true);
   protected readonly erro = signal('');
+
+  /** Do maior para o menor: as tres primeiras ganham a barra escura. */
+  protected readonly tracos = computed(() =>
+    [...(this.perfil()?.traits ?? [])].sort(
+      (a, b) => Number(b.percentage) - Number(a.percentage),
+    ),
+  );
 
   constructor() {
     const assessmentId = this.auth.assessmentId;

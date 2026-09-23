@@ -1,165 +1,111 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { Assessment as AssessmentModel, Question } from '../../core/models/api.models';
 import { Button } from '../../shared/button';
+import { TopBar } from '../../shared/kit';
+import { OptionCard } from '../../shared/option-card';
+import { ProgressBar } from '../../shared/progress-bar';
 import { Spinner } from '../../shared/spinner';
 
 /**
- * Jornada do questionario: uma pergunta por vez.
+ * Jornada de autodescoberta: uma pergunta situacional por tela.
  *
- * <p>Cada escolha e salva na hora (autosave). Nao existe botao de salvar e nao existe
- * rascunho local: o servidor e a unica fonte de verdade, entao fechar o navegador no meio
- * nao custa nada ao estudante.
+ * <p>Cada escolha e salva na hora (autosave), sem rascunho local: o servidor e a unica fonte
+ * de verdade, entao fechar o navegador no meio nao custa nada ao estudante. O "Continuar"
+ * so avanca; na ultima pergunta ele conclui e leva ao perfil.
  */
 @Component({
   selector: 'norte-assessment',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Button, Spinner],
+  imports: [RouterLink, Button, TopBar, OptionCard, ProgressBar, Spinner],
   template: `
-    <div class="conteudo">
+    <div class="tela">
+      <norte-top-bar [comVoltar]="true" (voltar)="voltar()">
+        <a class="botao botao--discreto botao--sm" routerLink="/meu-caminho">Pausar</a>
+      </norte-top-bar>
+
       @if (carregando()) {
-        <norte-spinner label="Preparando o questionario..." />
+        <norte-spinner label="Preparando a jornada..." />
       } @else if (questao(); as atual) {
-        <header class="topo">
-          <p class="texto-suave">
-            Pergunta {{ indice() + 1 }} de {{ questoes().length }}
-          </p>
-          <div class="progresso" role="meter" [attr.aria-valuenow]="respondidas()" aria-valuemin="0"
-               [attr.aria-valuemax]="questoes().length" aria-label="Progresso do questionario">
-            <div class="progresso-preenchido" [style.width.%]="percentualProgresso()"></div>
+        <div class="tela-corpo tela-corpo--pilha">
+          <norte-progress-bar
+            [value]="indice() + 1"
+            [max]="questoes().length"
+            [label]="'Pergunta ' + (indice() + 1) + ' de ' + questoes().length"
+          />
+
+          <div class="enunciado">
+            <h1>{{ atual.text }}</h1>
+            <p>Escolha o que mais combina com você. Não existe resposta certa.</p>
           </div>
-          <p class="texto-suave respondidas">
-            {{ respondidas() }} respondida(s). Minimo de {{ minimo() }} para concluir.
-          </p>
-        </header>
 
-        @if (erro()) {
-          <p class="aviso aviso--erro">{{ erro() }}</p>
-        }
-
-        <section class="cartao pergunta">
-          <h1>{{ atual.text }}</h1>
-          <p class="texto-suave">
-            Nao existe resposta certa. Escolha a que mais parece com voce.
-          </p>
-
-          <ul class="alternativas">
+          <div class="opcoes" role="radiogroup" [attr.aria-label]="atual.text">
             @for (opcao of atual.options; track opcao.id) {
-              <li>
-                <button
-                  type="button"
-                  class="alternativa"
-                  [class.alternativa--escolhida]="escolhaDe(atual.id) === opcao.id"
-                  [disabled]="salvando()"
-                  (click)="escolher(atual.id, opcao.id)"
-                >
-                  {{ opcao.text }}
-                </button>
-              </li>
+              <norte-option-card
+                [selected]="escolhaDe(atual.id) === opcao.id"
+                [disabled]="salvando()"
+                (escolher)="escolher(atual.id, opcao.id)"
+              >
+                {{ opcao.text }}
+              </norte-option-card>
             }
-          </ul>
-        </section>
+          </div>
 
-        <nav class="navegacao">
-          <norte-button
-            label="Voltar"
-            variant="secundario"
-            [disabled]="indice() === 0 || salvando()"
-            (click)="anterior()"
-          />
-
-          @if (indice() < questoes().length - 1) {
-            <norte-button
-              label="Proxima"
-              variant="secundario"
-              [disabled]="salvando()"
-              (click)="proxima()"
-            />
+          @if (erro()) {
+            <p class="aviso aviso--erro" role="alert">{{ erro() }}</p>
           }
+        </div>
 
+        <div class="tela-rodape">
           <norte-button
-            label="Concluir questionario"
-            [disabled]="!podeConcluir() || salvando()"
+            [label]="ultima() ? 'Ver meu perfil' : 'Continuar'"
+            size="lg"
+            [fullWidth]="true"
+            [iconRight]="ultima() ? undefined : 'arrow-right'"
+            [disabled]="escolhaDe(atual.id) === null || salvando()"
             [loading]="concluindo()"
-            loadingLabel="Concluindo..."
-            (click)="concluir()"
+            loadingLabel="Montando seu perfil..."
+            (click)="continuar()"
           />
-        </nav>
-
-        @if (!podeConcluir()) {
-          <p class="texto-suave">
-            Responda mais {{ minimo() - respondidas() }} pergunta(s) para poder concluir.
-          </p>
-        }
+        </div>
+      } @else if (erro()) {
+        <div class="tela-corpo">
+          <p class="aviso aviso--erro" role="alert">{{ erro() }}</p>
+        </div>
       }
     </div>
   `,
   styles: `
-    .topo {
-      margin-bottom: calc(var(--espaco) * 3);
-    }
-
-    .progresso {
-      background: var(--cor-superficie-alta);
-      border-radius: 999px;
-      height: 8px;
-      overflow: hidden;
-    }
-
-    .progresso-preenchido {
-      background: var(--cor-primaria);
-      height: 100%;
-      transition: width 0.3s ease;
-    }
-
-    .respondidas {
-      font-size: 0.85rem;
-      margin: 6px 0 0;
-    }
-
-    .pergunta h1 {
-      font-size: 1.5rem;
-    }
-
-    .alternativas {
-      list-style: none;
-      margin: calc(var(--espaco) * 2) 0 0;
-      padding: 0;
-    }
-
-    .alternativa {
-      background: var(--cor-fundo);
-      border: 1px solid var(--cor-borda);
-      border-radius: var(--raio-pequeno);
-      color: var(--cor-texto);
-      cursor: pointer;
-      font: inherit;
-      margin-bottom: var(--espaco);
-      padding: calc(var(--espaco) * 2);
-      text-align: left;
-      transition: border-color 0.15s ease, background 0.15s ease;
-      width: 100%;
-    }
-
-    .alternativa:hover:not(:disabled) {
-      border-color: var(--cor-acento);
-    }
-
-    .alternativa--escolhida {
-      background: var(--cor-superficie-alta);
-      border-color: var(--cor-primaria);
-      box-shadow: inset 3px 0 0 var(--cor-primaria);
-    }
-
-    .navegacao {
+    .enunciado {
       display: flex;
-      flex-wrap: wrap;
-      gap: var(--espaco);
-      margin-top: calc(var(--espaco) * 3);
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .enunciado h1 {
+      font-size: var(--fs-h2);
+      line-height: var(--lh-h2);
+      margin: 0;
+      text-wrap: balance;
+    }
+
+    .enunciado p {
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .opcoes {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .aviso {
+      margin: 0;
     }
   `,
 })
@@ -178,14 +124,7 @@ export class Assessment {
   protected readonly erro = signal('');
 
   protected readonly questao = computed(() => this.questoes()[this.indice()] ?? null);
-  protected readonly respondidas = computed(() => this.assessment()?.answeredCount ?? 0);
-  protected readonly minimo = computed(() => this.assessment()?.minimumAnswersToComplete ?? 0);
-  protected readonly podeConcluir = computed(() => this.respondidas() >= this.minimo());
-
-  protected readonly percentualProgresso = computed(() => {
-    const total = this.questoes().length;
-    return total === 0 ? 0 : (this.respondidas() / total) * 100;
-  });
+  protected readonly ultima = computed(() => this.indice() === this.questoes().length - 1);
 
   constructor() {
     forkJoin({
@@ -196,7 +135,7 @@ export class Assessment {
         this.questoes.set(questions);
         this.aplicar(assessment);
         // Retoma na primeira pergunta ainda sem resposta, e nao sempre na primeira.
-        this.indice.set(this.primeiraSemResposta(questions, assessment));
+        this.indice.set(this.primeiraSemResposta(questions, assessment) ?? 0);
         this.carregando.set(false);
       },
       error: (error: Error) => {
@@ -214,6 +153,10 @@ export class Assessment {
   }
 
   protected escolher(questionId: number, answerOptionId: number): void {
+    if (this.escolhaDe(questionId) === answerOptionId) {
+      return;
+    }
+
     this.salvando.set(true);
     this.erro.set('');
 
@@ -221,10 +164,6 @@ export class Assessment {
       next: (assessment) => {
         this.aplicar(assessment);
         this.salvando.set(false);
-        // Avanca sozinho: o estudante escolheu, nao precisa confirmar de novo.
-        if (this.indice() < this.questoes().length - 1) {
-          this.indice.update((atual) => atual + 1);
-        }
       },
       error: (error: Error) => {
         this.erro.set(error.message);
@@ -233,17 +172,35 @@ export class Assessment {
     });
   }
 
-  protected anterior(): void {
-    this.indice.update((atual) => Math.max(0, atual - 1));
+  protected voltar(): void {
+    if (this.indice() > 0) {
+      this.indice.update((atual) => atual - 1);
+    } else {
+      void this.router.navigate(['/meu-caminho']);
+    }
   }
 
-  protected proxima(): void {
-    this.indice.update((atual) => Math.min(this.questoes().length - 1, atual + 1));
-  }
-
-  protected concluir(): void {
-    this.concluindo.set(true);
+  protected continuar(): void {
     this.erro.set('');
+
+    if (!this.ultima()) {
+      this.indice.update((atual) => atual + 1);
+      return;
+    }
+
+    // Quem pulou alguma pergunta (voltando e avancando) e levado ate ela antes de concluir.
+    const pendente = this.primeiraSemResposta(this.questoes(), this.assessment());
+    if (pendente !== null && this.respondidas() < this.minimo()) {
+      this.indice.set(pendente);
+      this.erro.set('Falta responder esta aqui antes de ver o seu perfil.');
+      return;
+    }
+
+    this.concluir();
+  }
+
+  private concluir(): void {
+    this.concluindo.set(true);
 
     this.api.completeAssessment(this.assessmentId()).subscribe({
       next: () => void this.router.navigate(['/perfil']),
@@ -252,6 +209,14 @@ export class Assessment {
         this.concluindo.set(false);
       },
     });
+  }
+
+  private respondidas(): number {
+    return this.assessment()?.answeredCount ?? 0;
+  }
+
+  private minimo(): number {
+    return this.assessment()?.minimumAnswersToComplete ?? 0;
   }
 
   private aplicar(assessment: AssessmentModel): void {
@@ -267,9 +232,12 @@ export class Assessment {
     return assessment.id;
   }
 
-  private primeiraSemResposta(questions: Question[], assessment: AssessmentModel): number {
-    const respondidas = new Set(assessment.answers.map((answer) => answer.questionId));
+  private primeiraSemResposta(
+    questions: Question[],
+    assessment: AssessmentModel | null,
+  ): number | null {
+    const respondidas = new Set(assessment?.answers.map((answer) => answer.questionId) ?? []);
     const indice = questions.findIndex((question) => !respondidas.has(question.id));
-    return indice === -1 ? 0 : indice;
+    return indice === -1 ? null : indice;
   }
 }

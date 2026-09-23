@@ -1,206 +1,202 @@
-import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
-import { InterestLevel, ProfessionDetail as ProfessionDetailModel } from '../../core/models/api.models';
+import {
+  InterestLevel,
+  ProfessionDetail as ProfessionDetailModel,
+  RecommendationReason,
+} from '../../core/models/api.models';
+import { Badge, ScoreBadge } from '../../shared/badge';
 import { Button } from '../../shared/button';
-import { CompatibilityGauge } from '../../shared/compatibility-gauge';
-import { ReasonList } from '../../shared/reason-list';
+import { Card } from '../../shared/card';
+import { Icon, IconName } from '../../shared/icon';
+import { TopBar } from '../../shared/kit';
 import { Spinner } from '../../shared/spinner';
 
+/**
+ * Detalhe de uma profissao. A explicacao e literal ("Apareceu aqui porque suas respostas
+ * mostraram interesse em ...") e vem das mesmas justificativas que a API calculou: quando
+ * nenhuma caracteristica passou do corte de confianca, a tela diz isso em vez de improvisar.
+ */
 @Component({
   selector: 'norte-profession-detail',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, CompatibilityGauge, ReasonList, Spinner, Button],
+  imports: [RouterLink, Badge, ScoreBadge, Button, Card, Icon, TopBar, Spinner],
   template: `
-    <div class="conteudo">
-      @if (carregando()) {
-        <norte-spinner label="Carregando a profissao..." />
-      } @else if (erro()) {
-        <p class="aviso aviso--erro">{{ erro() }}</p>
-      } @else if (profissao(); as dados) {
-        <a class="voltar texto-suave" routerLink="/profissoes">&larr; Voltar para o explorador</a>
+    <div class="tela">
+      <norte-top-bar voltarPara="/profissoes" />
 
-        <header class="topo">
-          <div>
-            <span class="etiqueta">{{ dados.careerArea.name }}</span>
+      <div class="tela-corpo tela-corpo--pilha secoes">
+        @if (carregando()) {
+          <norte-spinner label="Carregando a profissão..." />
+        } @else if (profissao(); as dados) {
+          <div class="abertura">
+            <span class="sobrancelha">{{ dados.careerArea.name }}</span>
             <h1>{{ dados.name }}</h1>
-            <p class="texto-suave">{{ dados.summary }}</p>
-          </div>
-          @if (dados.compatibility !== null) {
-            <norte-compatibility-gauge [percentage]="dados.compatibility" />
-          }
-        </header>
-
-        @if (dados.compatibility !== null) {
-          <section class="cartao">
-            <norte-reason-list [reasons]="dados.reasons" />
-          </section>
-        } @else {
-          <p class="aviso aviso--neutro">
-            Responda ao questionario para ver o quanto esta profissao conversa com o seu
-            perfil.
-          </p>
-        }
-
-        <section class="cartao">
-          <h2>O que se faz</h2>
-          <p>{{ dados.description }}</p>
-
-          <h3>No dia a dia</h3>
-          <p class="texto-suave">{{ dados.typicalActivities }}</p>
-
-          <h3>Como se forma</h3>
-          <p class="texto-suave">{{ dados.educationPath }}</p>
-        </section>
-
-        <section class="cartao">
-          <h2>O que essa profissao mais exige</h2>
-          <ul class="exigencias">
-            @for (trait of dados.requiredTraits; track trait.traitId) {
-              <li>
-                <div class="exigencia-cabecalho">
-                  <strong>{{ trait.name }}</strong>
-                  <span class="peso" [attr.aria-label]="'peso ' + trait.weight + ' de 5'">
-                    @for (ponto of [1, 2, 3, 4, 5]; track ponto) {
-                      <span class="ponto" [class.ponto--cheio]="ponto <= trait.weight"></span>
-                    }
-                  </span>
-                </div>
-                <span class="texto-suave">{{ trait.description }}</span>
-              </li>
+            <div class="etiquetas">
+              @if (dados.compatibility !== null) {
+                <norte-score-badge [percentage]="dados.compatibility" />
+              }
+              @for (razao of dados.reasons; track razao.traitId) {
+                <norte-badge icon="check">{{ razao.traitName }}</norte-badge>
+              }
+            </div>
+            <div class="marcar">
+              <norte-button
+                class="metade"
+                [label]="dados.interestLevel === 'FAVORITE' ? 'Favoritada' : 'Favoritar'"
+                [variant]="dados.interestLevel === 'FAVORITE' ? 'secundario' : 'contorno'"
+                iconLeft="heart"
+                [fullWidth]="true"
+                [loading]="salvando() === 'FAVORITE'"
+                (click)="alternar('FAVORITE')"
+              />
+              <norte-button
+                class="metade"
+                label="Sem interesse"
+                [variant]="dados.interestLevel === 'NOT_INTERESTED' ? 'secundario' : 'contorno'"
+                iconLeft="x"
+                [fullWidth]="true"
+                [loading]="salvando() === 'NOT_INTERESTED'"
+                (click)="alternar('NOT_INTERESTED')"
+              />
+            </div>
+            @if (erro()) {
+              <p class="aviso aviso--erro" role="alert">{{ erro() }}</p>
             }
-          </ul>
-        </section>
+          </div>
 
-        @if (dados.microExperience; as experiencia) {
-          <section class="cartao destaque">
-            <h2>Experimente antes de decidir</h2>
-            <p>
-              <strong>{{ experiencia.title }}</strong>
-              <span class="etiqueta">cerca de {{ experiencia.estimatedMinutes }} min</span>
-            </p>
-            <p class="texto-suave">
-              A forma mais honesta de saber se combina com voce e fazer um pedaco do trabalho
-              de verdade.
-            </p>
-            <a class="botao" [routerLink]="['/microexperiencias', dados.id]">
-              Ver a microexperiencia
-            </a>
-          </section>
-        }
+          <norte-card tone="mint" icon="lightbulb" title="Por que apareceu pra você">
+            <p class="explicacao">{{ explicacao() }}</p>
+          </norte-card>
 
-        <section class="cartao">
-          <h2>O que voce achou?</h2>
-          <p class="texto-suave">
-            Marcar aqui ajuda a montar o seu painel. Voce pode mudar de ideia quando quiser.
-          </p>
-
-          @if (avisoFeedback()) {
-            <p class="aviso aviso--sucesso">{{ avisoFeedback() }}</p>
+          @for (secao of secoes(); track secao.titulo) {
+            <section class="secao">
+              <div class="secao-titulo">
+                <span class="chip"><norte-icon [name]="secao.icone" [size]="19" /></span>
+                <h2>{{ secao.titulo }}</h2>
+              </div>
+              <p>{{ secao.texto }}</p>
+            </section>
           }
 
-          <div class="acoes">
-            <norte-button
-              label="Quero saber mais"
-              [variant]="dados.interestLevel === 'FAVORITE' ? 'primario' : 'secundario'"
-              [loading]="salvandoFeedback() === 'FAVORITE'"
-              (click)="marcar('FAVORITE')"
-            />
-            <norte-button
-              label="Ainda em duvida"
-              [variant]="dados.interestLevel === 'NEUTRAL' ? 'primario' : 'secundario'"
-              [loading]="salvandoFeedback() === 'NEUTRAL'"
-              (click)="marcar('NEUTRAL')"
-            />
-            <norte-button
-              label="Nao e para mim"
-              [variant]="dados.interestLevel === 'NOT_INTERESTED' ? 'primario' : 'secundario'"
-              [loading]="salvandoFeedback() === 'NOT_INTERESTED'"
-              (click)="marcar('NOT_INTERESTED')"
-            />
-          </div>
-        </section>
-      }
+          @if (dados.requiredTraits.length) {
+            <section class="secao">
+              <div class="secao-titulo">
+                <span class="chip"><norte-icon name="list-checks" [size]="19" /></span>
+                <h2>O que ela mais pede?</h2>
+              </div>
+              <div class="etiquetas">
+                @for (traco of dados.requiredTraits; track traco.traitId) {
+                  <norte-badge tone="neutral">{{ traco.name }}</norte-badge>
+                }
+              </div>
+            </section>
+          }
+
+          @if (dados.microExperience; as experiencia) {
+            <norte-card
+              tone="inverse"
+              icon="flask-conical"
+              [eyebrow]="'Micro-experiência · ' + experiencia.estimatedMinutes + ' min'"
+              [title]="experiencia.title"
+            >
+              <p class="convite">
+                Um desafio curto, parecido com o que essa profissão resolve no dia a dia.
+              </p>
+              <a class="botao botao--secundario botao--largo" [routerLink]="['/microexperiencias', dados.id]">
+                Experimentar agora
+                <norte-icon name="arrow-right" />
+              </a>
+            </norte-card>
+          }
+        } @else if (erro()) {
+          <p class="aviso aviso--erro" role="alert">{{ erro() }}</p>
+        }
+      </div>
     </div>
   `,
   styles: `
-    .voltar {
-      display: inline-block;
-      margin-bottom: calc(var(--espaco) * 2);
-      text-decoration: none;
+    .secoes {
+      gap: 32px;
     }
 
-    .topo {
-      align-items: flex-start;
-      display: flex;
-      flex-wrap: wrap;
-      gap: calc(var(--espaco) * 2);
-      justify-content: space-between;
-      margin-bottom: calc(var(--espaco) * 3);
-    }
-
-    .topo h1 {
-      margin: 6px 0;
-    }
-
-    section {
-      margin-bottom: calc(var(--espaco) * 2);
-    }
-
-    .destaque {
-      border-color: var(--cor-primaria);
-    }
-
-    .destaque a {
-      text-decoration: none;
-    }
-
-    .exigencias {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .exigencias li {
-      border-bottom: 1px solid var(--cor-borda);
+    .abertura {
       display: flex;
       flex-direction: column;
-      padding: calc(var(--espaco) * 1.5) 0;
+      gap: 14px;
     }
 
-    .exigencias li:last-child {
-      border-bottom: none;
+    .abertura h1 {
+      margin: 0;
+      text-wrap: balance;
     }
 
-    .exigencia-cabecalho {
-      display: flex;
-      gap: var(--espaco);
-      justify-content: space-between;
-    }
-
-    .peso {
-      display: inline-flex;
-      gap: 3px;
-    }
-
-    .ponto {
-      background: var(--cor-superficie-alta);
-      border-radius: 50%;
-      display: inline-block;
-      height: 9px;
-      width: 9px;
-    }
-
-    .ponto--cheio {
-      background: var(--cor-primaria);
-    }
-
-    .acoes {
+    .etiquetas {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--espaco);
+      gap: 6px;
+    }
+
+    .marcar {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .metade {
+      flex: 1;
+    }
+
+    .aviso {
+      margin: 0;
+    }
+
+    .explicacao {
+      color: var(--text-strong);
+      margin: 0;
+    }
+
+    .secao {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .secao p {
+      margin: 0;
+      white-space: pre-line;
+    }
+
+    .secao-titulo {
+      align-items: center;
+      display: flex;
+      gap: 10px;
+    }
+
+    .secao-titulo h2 {
+      font-size: var(--fs-h3);
+      line-height: var(--lh-h3);
+      margin: 0;
+    }
+
+    .chip {
+      background: var(--green-50);
+      border-radius: 12px;
+      color: var(--green-700);
+      display: grid;
+      height: 36px;
+      place-items: center;
+      width: 36px;
+    }
+
+    .convite {
+      color: var(--green-100);
+      font-size: 16px;
+      line-height: 24px;
+      margin: 0;
     }
   `,
 })
@@ -214,8 +210,28 @@ export class ProfessionDetail {
   protected readonly profissao = signal<ProfessionDetailModel | null>(null);
   protected readonly carregando = signal(true);
   protected readonly erro = signal('');
-  protected readonly salvandoFeedback = signal<InterestLevel | null>(null);
-  protected readonly avisoFeedback = signal('');
+  protected readonly salvando = signal<InterestLevel | null>(null);
+
+  protected readonly explicacao = computed(() => {
+    const dados = this.profissao();
+    if (!dados || dados.compatibility === null) {
+      return 'Faça a jornada de autodescoberta para ver o quanto esta profissão combina com você.';
+    }
+    return explicar(dados.reasons);
+  });
+
+  protected readonly secoes = computed(() => {
+    const dados = this.profissao();
+    if (!dados) {
+      return [];
+    }
+    const secoes: { icone: IconName; titulo: string; texto: string }[] = [
+      { icone: 'briefcase', titulo: 'O que faz?', texto: dados.description },
+      { icone: 'clock', titulo: 'Como é o dia a dia?', texto: dados.typicalActivities },
+      { icone: 'graduation-cap', titulo: 'Como chegar lá?', texto: dados.educationPath },
+    ];
+    return secoes.filter((secao) => secao.texto?.trim());
+  });
 
   ngOnInit(): void {
     this.api.getProfession(Number(this.professionId()), this.auth.assessmentId).subscribe({
@@ -230,25 +246,40 @@ export class ProfessionDetail {
     });
   }
 
-  protected marcar(interestLevel: InterestLevel): void {
+  /** Marcar de novo o que ja esta marcado desfaz: volta para neutro. */
+  protected alternar(nivel: InterestLevel): void {
     const atual = this.profissao();
     if (!atual) {
       return;
     }
 
-    this.salvandoFeedback.set(interestLevel);
-    this.avisoFeedback.set('');
+    const interestLevel: InterestLevel = atual.interestLevel === nivel ? 'NEUTRAL' : nivel;
+    this.salvando.set(nivel);
+    this.erro.set('');
 
     this.api.saveFeedback(atual.id, interestLevel).subscribe({
       next: () => {
         this.profissao.set({ ...atual, interestLevel });
-        this.salvandoFeedback.set(null);
-        this.avisoFeedback.set('Anotado. Isso ja aparece no seu painel.');
+        this.salvando.set(null);
       },
       error: (error: Error) => {
         this.erro.set(error.message);
-        this.salvandoFeedback.set(null);
+        this.salvando.set(null);
       },
     });
   }
+}
+
+/** "Apareceu aqui porque suas respostas mostraram interesse em a, b e c." */
+export function explicar(razoes: RecommendationReason[]): string {
+  if (!razoes.length) {
+    return (
+      'Suas respostas ainda não apontaram com clareza para o que esta profissão mais pede. ' +
+      'Isso não a descarta: vale conhecer melhor e experimentar antes de tirar conclusões.'
+    );
+  }
+  const nomes = razoes.map((razao) => razao.traitName.toLocaleLowerCase('pt-BR'));
+  const lista =
+    nomes.length < 2 ? nomes[0] : `${nomes.slice(0, -1).join(', ')} e ${nomes[nomes.length - 1]}`;
+  return `Apareceu aqui porque suas respostas mostraram interesse em ${lista}.`;
 }

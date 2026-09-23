@@ -7,7 +7,7 @@ import { Button } from '../../shared/button';
 import { PasswordChecklist } from '../../shared/password-checklist';
 import { SelectField, SelectOption } from '../../shared/select-field';
 import { TextField } from '../../shared/text-field';
-import { AltRow, FormHeader, TopBar, Wordmark } from './kit';
+import { AltRow, FormHeader, TopBar, Wordmark } from '../../shared/kit';
 import {
   EMAIL_MAXIMO,
   NOME_MAXIMO,

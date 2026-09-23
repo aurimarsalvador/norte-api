@@ -27,7 +27,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
   styles: `
     .fundo {
       align-items: center;
-      background: rgb(6 10 20 / 72%);
+      background: rgb(30 42 36 / 45%);
       display: flex;
       inset: 0;
       justify-content: center;

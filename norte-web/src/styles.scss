@@ -1,28 +1,141 @@
 /* Design system do Norte: um arquivo, variaveis CSS, sem framework externo.
-   A paleta puxa para o azul-noite e o ambar de bussola, coerente com o nome do produto. */
+   Tokens vindos do Norte Design System (Claude Design): creme quente, verde-floresta como
+   unica cor de acao, e acentos brincalhoes (sol, coral, ceu) so para adesivos e ilustracao.
+   As fontes (Young Serif + Source Sans 3) sao carregadas no index.html. */
 
 :root {
-  --cor-fundo: #0f1729;
-  --cor-superficie: #182236;
-  --cor-superficie-alta: #212e47;
-  --cor-borda: #2c3a56;
+  /* Verde: primaria */
+  --green-900: #0f3d2e;
+  --green-800: #16573f;
+  --green-700: #1f7a5c;
+  --green-600: #2a8f6c;
+  --green-300: #9ccfb6;
+  --green-100: #ddefe6;
+  --green-50: #eef7f2;
 
-  --cor-texto: #eef2f9;
-  --cor-texto-suave: #a3b0c7;
+  /* Creme e areia: neutros quentes */
+  --cream-0: #ffffff;
+  --cream-50: #fffcf7;
+  --cream-100: #fbf6ee;
+  --cream-200: #f3eadb;
+  --sand-300: #e6dccb;
+  --sand-400: #cfc0a8;
 
-  --cor-primaria: #f0a742;
-  --cor-primaria-escura: #d08d2c;
-  --cor-acento: #5cc7c0;
+  /* Tinta: texto */
+  --ink-900: #1e2a24;
+  --ink-700: #3e4a44;
+  --ink-500: #626c66;
+  --ink-300: #a3aba6;
 
-  --cor-sucesso: #52c08a;
-  --cor-alerta: #e8825b;
-  --cor-erro: #e8657a;
+  /* Acentos */
+  --sun-400: #f4c45a;
+  --sun-100: #fdf0cf;
+  --coral-500: #e86f4f;
+  --coral-100: #fbe3da;
+  --sky-400: #7fb3e0;
+  --sky-100: #e3eff9;
 
-  --raio: 12px;
-  --raio-pequeno: 8px;
+  /* Feedback */
+  --error-600: #b83a26;
+  --error-100: #fbe6e1;
+  --success-600: #1f7a5c;
+  --success-100: #ddefe6;
+
+  /* Aliases semanticos */
+  --bg-page: var(--cream-100);
+  --bg-subtle: var(--cream-200);
+  --surface-card: var(--cream-0);
+  --surface-raised: var(--cream-50);
+  --surface-inverse: var(--green-900);
+  --text-strong: var(--ink-900);
+  --text-body: var(--ink-700);
+  --text-muted: var(--ink-500);
+  --text-disabled: var(--ink-300);
+  --text-on-primary: #ffffff;
+  --text-link: var(--green-700);
+  --border-default: var(--sand-300);
+  --border-strong: var(--sand-400);
+  --border-focus: var(--green-700);
+  --action-primary: var(--green-700);
+  --action-primary-hover: var(--green-800);
+  --action-primary-press: var(--green-900);
+  --action-secondary: var(--green-50);
+  --action-secondary-hover: var(--green-100);
+  --focus-ring: 0 0 0 4px rgb(31 122 92 / 22%);
+  --focus-ring-error: 0 0 0 4px rgb(184 58 38 / 16%);
+
+  /* Tipografia */
+  --font-display: 'Young Serif', Georgia, 'Times New Roman', serif;
+  --font-body: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+  --fs-display: 40px;
+  --lh-display: 44px;
+  --fs-h1: 32px;
+  --lh-h1: 38px;
+  --fs-h2: 24px;
+  --lh-h2: 30px;
+  --fs-h3: 20px;
+  --lh-h3: 26px;
+  --fs-body-lg: 19px;
+  --lh-body-lg: 28px;
+  --fs-body: 17px;
+  --lh-body: 25px;
+  --fs-label: 15px;
+  --lh-label: 20px;
+  --fs-small: 14px;
+  --lh-small: 20px;
+  --fs-eyebrow: 13px;
+  --ls-eyebrow: 0.08em;
+
+  /* Espaco, raios, controles */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-14: 56px;
+  --space-18: 72px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+  --control-h: 52px;
+  --control-h-lg: 56px;
+  --screen-max: 440px;
+  --screen-pad: 24px;
+
+  /* Sombras e movimento */
+  --shadow-sm: 0 1px 2px rgb(30 42 36 / 6%);
+  --shadow-md: 0 6px 18px -6px rgb(30 42 36 / 14%);
+  --shadow-lg: 0 24px 48px -16px rgb(30 42 36 / 22%);
+  --shadow-button: 0 2px 0 var(--green-900);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 360ms;
+
+  /* Nomes anteriores ao design system. As telas das jornadas 2 a 6 ainda os usam; aqui
+     eles so apontam para os tokens novos, para o app inteiro falar a mesma lingua visual. */
+  --cor-fundo: var(--bg-page);
+  --cor-superficie: var(--surface-card);
+  --cor-superficie-alta: var(--bg-subtle);
+  --cor-borda: var(--border-default);
+  --cor-texto: var(--text-strong);
+  --cor-texto-suave: var(--text-muted);
+  --cor-primaria: var(--action-primary);
+  --cor-primaria-escura: var(--action-primary-hover);
+  --cor-acento: var(--green-600);
+  --cor-sucesso: var(--success-600);
+  --cor-alerta: var(--coral-500);
+  --cor-erro: var(--error-600);
+  --raio: var(--radius-lg);
+  --raio-pequeno: var(--radius-md);
   --espaco: 8px;
-  --sombra: 0 10px 30px rgb(0 0 0 / 35%);
-
+  --sombra: var(--shadow-lg);
   --largura-conteudo: 1080px;
 }
 
@@ -38,29 +151,37 @@ body {
 }
 
 body {
-  background: var(--cor-fundo);
-  color: var(--cor-texto);
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  line-height: 1.6;
+  background: var(--bg-page);
+  color: var(--text-body);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
 }
 
+/* Titulos em serifa, sempre no peso regular: e o unico peso da Young Serif. */
 h1,
 h2,
 h3 {
-  line-height: 1.25;
+  color: var(--text-strong);
+  font-family: var(--font-display);
+  font-weight: 400;
   margin: 0 0 calc(var(--espaco) * 2);
 }
 
 h1 {
-  font-size: 2rem;
+  font-size: var(--fs-h1);
+  line-height: var(--lh-h1);
 }
 
 h2 {
-  font-size: 1.4rem;
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
 }
 
 h3 {
-  font-size: 1.1rem;
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
 }
 
 p {
@@ -68,7 +189,12 @@ p {
 }
 
 a {
-  color: var(--cor-acento);
+  color: var(--text-link);
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: var(--action-primary-hover);
 }
 
 .conteudo {
@@ -78,124 +204,236 @@ a {
 }
 
 .texto-suave {
-  color: var(--cor-texto-suave);
+  color: var(--text-muted);
+}
+
+.visualmente-oculto {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
 
 .cartao {
-  background: var(--cor-superficie);
-  border: 1px solid var(--cor-borda);
-  border-radius: var(--raio);
-  padding: calc(var(--espaco) * 3);
+  background: var(--surface-card);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
 }
 
-/* Formularios */
+/* Formularios. Os campos de norte-text-field e norte-select-field seguem as mesmas medidas. */
 
 .campo {
   display: flex;
   flex-direction: column;
-  gap: var(--espaco);
-  margin-bottom: calc(var(--espaco) * 2);
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
 }
 
 .campo label {
+  color: var(--text-strong);
+  font-size: var(--fs-label);
   font-weight: 600;
-  font-size: 0.9rem;
+  line-height: var(--lh-label);
 }
 
 .campo input,
 .campo select,
 .campo textarea {
-  background: var(--cor-fundo);
-  border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-pequeno);
-  color: var(--cor-texto);
+  background: var(--surface-card);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-strong);
   font: inherit;
-  padding: calc(var(--espaco) * 1.5);
+  font-size: 17px;
+  padding: 0 16px;
+  transition:
+    border-color var(--dur-fast),
+    box-shadow var(--dur-base) var(--ease-out);
   width: 100%;
+}
+
+.campo input,
+.campo select {
+  height: var(--control-h);
+}
+
+.campo textarea {
+  padding: 12px 16px;
 }
 
 .campo input:focus,
 .campo select:focus,
-.campo textarea:focus,
+.campo textarea:focus {
+  border-color: var(--border-focus);
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid var(--cor-primaria);
+  outline: 2px solid var(--border-focus);
   outline-offset: 2px;
 }
 
 .campo .erro-campo {
-  color: var(--cor-erro);
-  font-size: 0.85rem;
+  color: var(--error-600);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
 }
 
-/* Botoes */
+/* Botoes: sempre pilula. O primario tem um "labio" verde-escuro de 2px que some quando
+   pressionado, o toque tatil da marca. */
 
 .botao {
-  background: var(--cor-primaria);
-  border: 1px solid transparent;
-  border-radius: var(--raio-pequeno);
-  color: #1b1200;
+  align-items: center;
+  background: var(--action-primary);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-button);
+  color: var(--text-on-primary);
   cursor: pointer;
-  font: inherit;
+  display: inline-flex;
+  font-family: var(--font-body);
+  font-size: 17px;
   font-weight: 600;
-  padding: calc(var(--espaco) * 1.5) calc(var(--espaco) * 3);
-  transition: background 0.15s ease;
+  gap: 10px;
+  height: var(--control-h);
+  justify-content: center;
+  letter-spacing: 0.005em;
+  padding: 0 22px;
+  text-decoration: none;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast);
 }
 
 .botao:hover:not(:disabled) {
-  background: var(--cor-primaria-escura);
+  background: var(--action-primary-hover);
+  color: var(--text-on-primary);
+}
+
+.botao:active:not(:disabled) {
+  box-shadow: none;
+  transform: translateY(2px);
+}
+
+.botao:focus-visible {
+  box-shadow: var(--shadow-button), var(--focus-ring);
+  outline: none;
 }
 
 .botao:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+}
+
+/* Carregando tambem desabilita o clique, mas nao deve parecer um botao apagado. */
+.botao:disabled:not(.botao--carregando) {
+  background: var(--sand-300);
+  box-shadow: none;
+  color: var(--text-muted);
+}
+
+.botao--secundario,
+.botao--contorno,
+.botao--discreto {
+  box-shadow: none;
 }
 
 .botao--secundario {
-  background: transparent;
-  border-color: var(--cor-borda);
-  color: var(--cor-texto);
+  background: var(--action-secondary);
+  color: var(--green-800);
 }
 
 .botao--secundario:hover:not(:disabled) {
-  background: var(--cor-superficie-alta);
+  background: var(--action-secondary-hover);
+  color: var(--green-800);
+}
+
+.botao--contorno {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--text-strong);
+}
+
+.botao--contorno:hover:not(:disabled) {
+  background: var(--cream-200);
+  color: var(--text-strong);
 }
 
 .botao--discreto {
   background: transparent;
-  border-color: transparent;
-  color: var(--cor-texto-suave);
-  padding: var(--espaco);
+  color: var(--text-link);
 }
 
 .botao--discreto:hover:not(:disabled) {
-  color: var(--cor-texto);
+  background: var(--green-50);
+  color: var(--text-link);
+}
+
+.botao--secundario:disabled:not(.botao--carregando),
+.botao--contorno:disabled:not(.botao--carregando),
+.botao--discreto:disabled:not(.botao--carregando) {
+  background: transparent;
+}
+
+.botao--secundario:focus-visible,
+.botao--contorno:focus-visible,
+.botao--discreto:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.botao--sm {
+  font-size: 15px;
+  height: 40px;
+  padding: 0 16px;
+}
+
+.botao--lg {
+  font-size: 18px;
+  height: var(--control-h-lg);
+  padding: 0 28px;
+}
+
+.botao--largo {
+  width: 100%;
+}
+
+/* Link de texto sublinhado, usado nas linhas "Ja tem uma conta? Entrar". */
+.link-texto {
+  color: var(--text-link);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* Avisos */
 
 .aviso {
-  border-radius: var(--raio-pequeno);
-  padding: calc(var(--espaco) * 1.5) calc(var(--espaco) * 2);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
   margin-bottom: calc(var(--espaco) * 2);
+  padding: 12px 16px;
 }
 
 .aviso--erro {
-  background: rgb(232 101 122 / 12%);
-  border: 1px solid var(--cor-erro);
-  color: #ffd7de;
+  background: var(--error-100);
+  color: var(--error-600);
 }
 
 .aviso--sucesso {
-  background: rgb(82 192 138 / 12%);
-  border: 1px solid var(--cor-sucesso);
-  color: #d6f5e5;
+  background: var(--success-100);
+  color: var(--green-800);
 }
 
 .aviso--neutro {
-  background: var(--cor-superficie-alta);
-  border: 1px solid var(--cor-borda);
-  color: var(--cor-texto-suave);
+  background: var(--bg-subtle);
+  color: var(--text-body);
 }
 
 /* Grades */
@@ -207,12 +445,64 @@ a:focus-visible {
 }
 
 .etiqueta {
-  background: var(--cor-superficie-alta);
-  border-radius: 999px;
-  color: var(--cor-texto-suave);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
   display: inline-block;
-  font-size: 0.78rem;
+  font-size: var(--fs-eyebrow);
+  font-weight: 600;
   padding: 2px 10px;
+}
+
+.sobrancelha {
+  color: var(--green-700);
+  font-size: var(--fs-eyebrow);
+  font-weight: 700;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+}
+
+/* Telas da jornada 1 (entrada e cadastro): coluna unica de ate 440px, com a acao principal
+   ancorada no pe da tela. As telas entram subindo 12px enquanto aparecem. */
+
+.tela {
+  animation: tela-entrar var(--dur-slow) var(--ease-out);
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  max-width: var(--screen-max);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.tela-corpo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 12px var(--screen-pad) 28px;
+}
+
+.tela-espaco {
+  flex: 1;
+  min-height: 28px;
+}
+
+.tela-acoes {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+@keyframes tela-entrar {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

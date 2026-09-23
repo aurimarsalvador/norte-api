@@ -1,22 +1,41 @@
 import { Routes } from '@angular/router';
 
-import { authGuard } from './core/auth.guard';
+import { authGuard, guestGuard } from './core/auth.guard';
+
+/** Telas da jornada de entrada: tem barra propria, entao dispensam o cabecalho do app. */
+const SEM_CASCA = { casca: false };
 
 /**
  * Rotas em portugues porque a URL tambem e interface para o estudante.
  * Tudo carregado sob demanda: a tela de entrar nao deve pagar pelo bundle do catalogo.
  */
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'meu-caminho' },
+  {
+    path: '',
+    pathMatch: 'full',
+    title: 'Norte',
+    data: SEM_CASCA,
+    canActivate: [guestGuard],
+    loadComponent: () => import('./features/onboarding/landing').then((m) => m.Landing),
+  },
   {
     path: 'entrar',
     title: 'Entrar | Norte',
-    loadComponent: () => import('./features/auth/login').then((m) => m.Login),
+    data: SEM_CASCA,
+    loadComponent: () => import('./features/onboarding/login').then((m) => m.Login),
   },
   {
     path: 'cadastrar',
     title: 'Criar conta | Norte',
-    loadComponent: () => import('./features/auth/register').then((m) => m.Register),
+    data: SEM_CASCA,
+    loadComponent: () => import('./features/onboarding/register').then((m) => m.Register),
+  },
+  {
+    path: 'boas-vindas',
+    title: 'Boas-vindas | Norte',
+    data: SEM_CASCA,
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/onboarding/welcome').then((m) => m.Welcome),
   },
   {
     path: 'questionario',

@@ -1,0 +1,15 @@
+INSERT INTO traits (code, name, description) VALUES
+    ('RESOLUCAO_PROBLEMAS',   'Resolução de problemas',        'Gosta de encarar situações travadas e encontrar um caminho prático para destravá-las.'),
+    ('ANALISE_LOGICA',        'Análise e raciocínio lógico',   'Organiza informações, compara hipóteses e chega a conclusões sustentadas por evidência.'),
+    ('CURIOSIDADE_CIENTIFICA','Curiosidade científica',        'Sente prazer em investigar como as coisas funcionam e em aprender assuntos novos a fundo.'),
+    ('CRIATIVIDADE',          'Criatividade',                  'Propõe caminhos diferentes do óbvio e combina ideias de áreas distintas.'),
+    ('EXPRESSAO_ARTISTICA',   'Expressão artística',           'Comunica ideias por forma, imagem, som ou texto, cuidando da estética do resultado.'),
+    ('COMUNICACAO',           'Comunicação',                   'Explica com clareza, adapta a linguagem ao público e escuta antes de responder.'),
+    ('EMPATIA',               'Empatia e cuidado com pessoas', 'Percebe o que o outro sente e considera esse impacto nas próprias decisões.'),
+    ('TRABALHO_EQUIPE',       'Trabalho em equipe',            'Rende mais junto com outras pessoas e ajuda o grupo a chegar a um resultado comum.'),
+    ('LIDERANCA',             'Liderança',                     'Assume a coordenação, distribui responsabilidades e sustenta decisões difíceis.'),
+    ('ORGANIZACAO',           'Organização e planejamento',    'Estrutura etapas, prazos e prioridades antes de começar a executar.'),
+    ('ATENCAO_DETALHES',      'Atenção a detalhes',            'Percebe inconsistências pequenas que passariam despercebidas e revisa o próprio trabalho.'),
+    ('HABILIDADE_MANUAL',     'Habilidade prática e manual',   'Aprende fazendo, com as mãos, montando, testando e ajustando o resultado físico.'),
+    ('VISAO_NEGOCIO',         'Visão de negócio',              'Enxerga oportunidades, custos e o valor que uma solução gera para quem a usa.'),
+    ('PERSISTENCIA',          'Persistência e foco',           'Mantém o esforço em tarefas longas, mesmo quando o retorno demora a aparecer.');

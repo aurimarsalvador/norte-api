@@ -1,10 +1,10 @@
 package br.com.norte.norte_api;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class NorteApiApplicationTests {
+import br.com.norte.norte_api.support.AbstractIntegrationTest;
+
+class NorteApiApplicationTests extends AbstractIntegrationTest {
 
 	@Test
 	void contextLoads() {

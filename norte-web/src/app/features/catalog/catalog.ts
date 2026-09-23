@@ -114,7 +114,7 @@ import { Spinner } from '../../shared/spinner';
     .filtro--ativo {
       background: var(--cor-primaria);
       border-color: var(--cor-primaria);
-      color: #1b1200;
+      color: var(--text-on-primary);
       font-weight: 600;
     }
 

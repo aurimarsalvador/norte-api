@@ -19,10 +19,28 @@ Em produção o app é servido por nginx, que faz proxy de `/api` para a API —
 
 ```
 core/       ApiService, AuthService, TokenStorage, interceptors, authGuard, models
-shared/     spinner, empty-state, card, button, modal, trait-bar,
-            compatibility-gauge, reason-list
-features/   auth, assessment, profile, catalog, microexperience, my-path
+shared/     icon, button, text-field, select-field, password-checklist, spinner,
+            empty-state, card, modal, trait-bar, compatibility-gauge, reason-list
+features/   onboarding, assessment, profile, catalog, microexperience, my-path
 ```
+
+## Design system
+
+Os tokens (cores, tipografia, espaços, raios, sombras, movimento) vêm do Norte Design System
+feito no Claude Design e vivem em `src/styles.scss`. Creme quente de fundo, verde-floresta
+como única cor de ação, Young Serif nos títulos e Source Sans 3 no texto (Google Fonts,
+carregadas no `index.html`). Os nomes antigos (`--cor-*`, `--raio`, `--espaco`) continuam
+existindo como apelidos dos tokens novos, então as telas das jornadas 2 a 6 herdam a paleta
+sem precisar ser reescritas.
+
+A jornada 1 (`features/onboarding`) segue o design à risca: apresentação (`/`), cadastro
+(`/cadastrar`), entrar (`/entrar`) e boas-vindas (`/boas-vindas`). Essas rotas têm
+`data: { casca: false }` e desenham a própria barra, sem o cabeçalho do app. A validação do
+cadastro acontece enquanto o estudante digita e espelha o `RegisterRequest` da API: 8+
+caracteres, uma letra e um número na senha, e ano escolar de 1 a 3.
+
+Ainda sem arte: a marca é o nome em texto ("norte" em Young Serif), e os blocos coloridos
+das telas de apresentação e boas-vindas guardam o lugar das ilustrações.
 
 Componentes são standalone, com template e estilo inline (um arquivo por componente),
 `ChangeDetectionStrategy.OnPush` e signals para estado. As features são carregadas sob

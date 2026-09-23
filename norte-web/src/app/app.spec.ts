@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 
 import { App } from './app';
 import { routes } from './app.routes';
@@ -37,5 +37,27 @@ describe('App', () => {
 
     const texto = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(texto).toContain('A escolha continua sendo sua.');
+  });
+
+  it('a apresentacao desenha a propria barra, sem o cabecalho do app', async () => {
+    const fixture = TestBed.createComponent(App);
+    await TestBed.inject(Router).navigateByUrl('/');
+    await fixture.whenStable();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('header.barra')).toBeNull();
+    expect(el.textContent).toContain('Você não precisa escolher sua carreira');
+  });
+
+  it('quem ja tem sessao pula a apresentacao e cai no Meu Caminho', async () => {
+    localStorage.setItem('norte.token', 'token-de-teste');
+    const fixture = TestBed.createComponent(App);
+    const router = TestBed.inject(Router);
+
+    await router.navigateByUrl('/');
+    await fixture.whenStable();
+
+    expect(router.url).toBe('/meu-caminho');
+    expect((fixture.nativeElement as HTMLElement).querySelector('header.barra')).not.toBeNull();
   });
 });

@@ -1,4 +1,4 @@
-# Norte — API
+# Norte
 
 Plataforma de exploração profissional para estudantes do Ensino Médio.
 
@@ -7,7 +7,9 @@ sistema deriva um perfil de características (*traits*) e devolve **compatibilid
 percentuais com justificativa explícita**. Quando não há justificativa suficiente, o produto
 prefere não explicar a explicar mal.
 
-Este repositório contém a API (Spring Boot). O frontend Angular vive em `../norte-web`.
+Este repositório contém as duas pontas da aplicação: a API Spring Boot na raiz e o
+frontend Angular em [`norte-web/`](norte-web/README.md). Ficam juntos para que um clone
+único baste para subir o sistema inteiro com `docker compose up --build`.
 
 ---
 
@@ -42,7 +44,7 @@ docker compose up --build
 docker compose up -d postgres
 ./mvnw spring-boot:run
 
-cd ../norte-web && npm install && npm start
+cd norte-web && npm install && npm start
 ```
 
 ### Testes
@@ -50,7 +52,7 @@ cd ../norte-web && npm install && npm start
 ```bash
 ./mvnw test                                   # precisa de Docker ativo (Testcontainers)
 ./mvnw test -Dtest='*Calculator*Test,*ExplanationBuilder*Test'   # só o motor, sem Docker
-cd ../norte-web && npm test
+cd norte-web && npm test
 ```
 
 ---

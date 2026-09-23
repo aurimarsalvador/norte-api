@@ -1,0 +1,223 @@
+/* Design system do Norte: um arquivo, variaveis CSS, sem framework externo.
+   A paleta puxa para o azul-noite e o ambar de bussola, coerente com o nome do produto. */
+
+:root {
+  --cor-fundo: #0f1729;
+  --cor-superficie: #182236;
+  --cor-superficie-alta: #212e47;
+  --cor-borda: #2c3a56;
+
+  --cor-texto: #eef2f9;
+  --cor-texto-suave: #a3b0c7;
+
+  --cor-primaria: #f0a742;
+  --cor-primaria-escura: #d08d2c;
+  --cor-acento: #5cc7c0;
+
+  --cor-sucesso: #52c08a;
+  --cor-alerta: #e8825b;
+  --cor-erro: #e8657a;
+
+  --raio: 12px;
+  --raio-pequeno: 8px;
+  --espaco: 8px;
+  --sombra: 0 10px 30px rgb(0 0 0 / 35%);
+
+  --largura-conteudo: 1080px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  margin: 0 0 calc(var(--espaco) * 2);
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.4rem;
+}
+
+h3 {
+  font-size: 1.1rem;
+}
+
+p {
+  margin: 0 0 calc(var(--espaco) * 2);
+}
+
+a {
+  color: var(--cor-acento);
+}
+
+.conteudo {
+  max-width: var(--largura-conteudo);
+  margin: 0 auto;
+  padding: calc(var(--espaco) * 4) calc(var(--espaco) * 3);
+}
+
+.texto-suave {
+  color: var(--cor-texto-suave);
+}
+
+.cartao {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  padding: calc(var(--espaco) * 3);
+}
+
+/* Formularios */
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco);
+  margin-bottom: calc(var(--espaco) * 2);
+}
+
+.campo label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  background: var(--cor-fundo);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-pequeno);
+  color: var(--cor-texto);
+  font: inherit;
+  padding: calc(var(--espaco) * 1.5);
+  width: 100%;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--cor-primaria);
+  outline-offset: 2px;
+}
+
+.campo .erro-campo {
+  color: var(--cor-erro);
+  font-size: 0.85rem;
+}
+
+/* Botoes */
+
+.botao {
+  background: var(--cor-primaria);
+  border: 1px solid transparent;
+  border-radius: var(--raio-pequeno);
+  color: #1b1200;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  padding: calc(var(--espaco) * 1.5) calc(var(--espaco) * 3);
+  transition: background 0.15s ease;
+}
+
+.botao:hover:not(:disabled) {
+  background: var(--cor-primaria-escura);
+}
+
+.botao:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.botao--secundario {
+  background: transparent;
+  border-color: var(--cor-borda);
+  color: var(--cor-texto);
+}
+
+.botao--secundario:hover:not(:disabled) {
+  background: var(--cor-superficie-alta);
+}
+
+.botao--discreto {
+  background: transparent;
+  border-color: transparent;
+  color: var(--cor-texto-suave);
+  padding: var(--espaco);
+}
+
+.botao--discreto:hover:not(:disabled) {
+  color: var(--cor-texto);
+}
+
+/* Avisos */
+
+.aviso {
+  border-radius: var(--raio-pequeno);
+  padding: calc(var(--espaco) * 1.5) calc(var(--espaco) * 2);
+  margin-bottom: calc(var(--espaco) * 2);
+}
+
+.aviso--erro {
+  background: rgb(232 101 122 / 12%);
+  border: 1px solid var(--cor-erro);
+  color: #ffd7de;
+}
+
+.aviso--sucesso {
+  background: rgb(82 192 138 / 12%);
+  border: 1px solid var(--cor-sucesso);
+  color: #d6f5e5;
+}
+
+.aviso--neutro {
+  background: var(--cor-superficie-alta);
+  border: 1px solid var(--cor-borda);
+  color: var(--cor-texto-suave);
+}
+
+/* Grades */
+
+.grade {
+  display: grid;
+  gap: calc(var(--espaco) * 2);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.etiqueta {
+  background: var(--cor-superficie-alta);
+  border-radius: 999px;
+  color: var(--cor-texto-suave);
+  display: inline-block;
+  font-size: 0.78rem;
+  padding: 2px 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

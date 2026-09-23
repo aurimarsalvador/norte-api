@@ -45,7 +45,7 @@ services:
 
   norte-web:
     build:
-      context: ../norte-web
+      context: ./norte-web
       dockerfile: Dockerfile
     container_name: norte-web
     depends_on:
